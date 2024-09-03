@@ -1,0 +1,117 @@
+#include <iostream>
+#include <map>
+#include <string>
+
+using namespace std;
+
+struct Account {
+    string userID;
+    string password;
+    double balance = 0.0;
+};
+
+map<string, Account> accounts;
+
+bool createAccount() {
+    string userID, password;
+    cout << "Please enter your user name: ";
+    cin >> userID;
+    cout << "Please enter your password: ";
+    cin >> password;
+    
+    if (accounts.find(userID) != accounts.end()) {
+        cout << "Account already exists!" << endl;
+        return false;
+    }
+
+    Account newAccount{userID, password, 0.0};
+    accounts[userID] = newAccount;
+    cout << "Thank You! Your account has been created!\n";
+    return true;
+}
+
+bool login(string& userID) {
+    cout << "Please enter your user id: ";
+    cin >> userID;
+    string password;
+    cout << "Please enter your password: ";
+    cin >> password;
+
+    if (accounts.find(userID) != accounts.end() && accounts[userID].password == password) {
+        cout << "Access Granted!\n";
+        return true;
+    } else {
+        cout << "*** LOGIN FAILED! ***\n";
+        return false;
+    }
+}
+
+void deposit(string userID) {
+    double amount;
+    cout << "Amount of deposit: $";
+    cin >> amount;
+    accounts[userID].balance += amount;
+}
+
+void withdraw(string userID) {
+    double amount;
+    cout << "Amount of withdrawal: $";
+    cin >> amount;
+    if (amount <= accounts[userID].balance) {
+        accounts[userID].balance -= amount;
+    } else {
+        cout << "Insufficient balance!\n";
+    }
+}
+
+void requestBalance(string userID) {
+    cout << "Your balance is $" << accounts[userID].balance << ".\n";
+}
+
+void displayMenu() {
+    cout << "Hi! Welcome to the ATM Machine!\nPlease select an option from the menu below:\n";
+    cout << "l -> Login\n";
+    cout << "c -> Create New Account\n";
+    cout << "q -> Quit\n";
+}
+
+int main() {
+    char option;
+    string userID;
+
+    while (true) {
+        displayMenu();
+        cin >> option;
+
+        if (option == 'q') break;
+
+        switch (option) {
+            case 'c':
+                createAccount();
+                break;
+            case 'l':
+                if (login(userID)) {
+                    char subOption;
+                    do {
+                        cout << "d -> Deposit Money\nw -> Withdraw Money\nr -> Request Balance\nq -> Quit\n";
+                        cin >> subOption;
+                        switch (subOption) {
+                            case 'd':
+                                deposit(userID);
+                                break;
+                            case 'w':
+                                withdraw(userID);
+                                break;
+                            case 'r':
+                                requestBalance(userID);
+                                break;
+                        }
+                    } while (subOption != 'q');
+                }
+                break;
+        }
+    }
+
+    return 0;
+}
+
